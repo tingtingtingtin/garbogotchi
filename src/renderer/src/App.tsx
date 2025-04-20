@@ -1,19 +1,20 @@
 import ModelVideo from './components/ModelVideo';
 import ErrorBoundary from './components/ErrorBoundary';
 import { useState, useEffect } from 'react';
-import tamagotchiImage from './assets/skins/lebron.png';
+import tamagotchiImage from './assets/skins/bear.png';
 import PopUp from './components/PopUp';
 import InteractButton from './components/InteractButton';
 import { Heart, Dices, Laugh, Trash2, Bomb, Shirt } from 'lucide-react';
-import Bar from './components/Bar'; // Import the Bar component
+import Bar from './components/Bar';
 import explosionGif from './assets/explode.gif'
 import Shop from './components/Shop';
+import ThoughtBubble from './components/ThoughtBubble';
 
 function App(): React.JSX.Element {
   const [points, setPoints] = useState(0);
   const [level, setLevel] = useState(1);
-  const [happiness, setHappiness] = useState(80); // Initial happiness value (0-100)
-  const [xp, setXp] = useState(0); // Initial XP value (0-100)
+  const [happiness, setHappiness] = useState(80);
+  const [xp, setXp] = useState(0);
   const [popUp, setPopUp] = useState({
     header: 'Instructions',
     message: 'Your Tamagotchi loves cleanliness! Place trash in the right bins to earn points.'
@@ -21,10 +22,11 @@ function App(): React.JSX.Element {
   const [exploded, setExploded] = useState(false);
   const [skin, setSkin] = useState(tamagotchiImage);
   const [showShop, setShowShop] = useState(false);
+  const [prediction, setPrediction] = useState<string | null>(null);
 
   const handleSkinSelect = (selectedSkin: string): void => {
-    setSkin(selectedSkin); // Update the Tamagotchi skin
-    setShowShop(false); // Close the shop after selecting a skin
+    setSkin(selectedSkin);
+    setShowShop(false);
   };
 
   const clearPopUp = (): void => setPopUp({ header: '', message: '' });
@@ -78,7 +80,7 @@ function App(): React.JSX.Element {
         message: `You gambled and got ${randomValue + randomMod} XP!`
       });
     } else {
-      setHappiness((prev) => Math.max(0, prev - randomMod)); // Decrease happiness if the roll is low
+      setHappiness((prev) => Math.max(0, prev - 10 - randomMod)); // Decrease happiness if the roll is low
       setPopUp({
         header: `You rolled a ${randomValue}`,
         message: `You gambled and lost! Your tamagotchi is upset :(`
@@ -97,7 +99,7 @@ function App(): React.JSX.Element {
         <p>Points: {points}</p>
       </div>
       <div className="tamagotchi-section flex">
-        <div className="flex gap-8 left-[-32px] absolute mt-12">
+        <div className="flex gap-8 left-[2px] absolute mt-6">
           <div className="flex flex-col">
             <Bar label="Happiness" progress={happiness} />
             <Laugh className="mt-2" />
@@ -124,6 +126,9 @@ function App(): React.JSX.Element {
             />
           </div>
         )}
+        <div className="flex gap-8 right-[2px] absolute mt-6">
+          {prediction && <ThoughtBubble prediction={prediction} />}
+        </div>
       </div>
 
       {popUp.header && popUp.message && (
@@ -138,12 +143,9 @@ function App(): React.JSX.Element {
           <InteractButton Icon={Bomb} onClick={explode}/>
         </div>
       </div>
-      <div>
-        <h1>Electron + React + Teachable Machine</h1>
-        <ErrorBoundary>
-          <ModelVideo />
-        </ErrorBoundary>
-      </div>
+      <ErrorBoundary>
+        <ModelVideo onPrediction={setPrediction}/>
+      </ErrorBoundary>
 
       <footer className="footer">
         <p>GarboGotchi</p>
