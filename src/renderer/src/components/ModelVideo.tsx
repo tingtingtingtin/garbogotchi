@@ -17,7 +17,7 @@ const ClassEnum: { [key: string]: number } = {
   "Trash": 0,
   "Recycleable": 1,
   "Compost": 2,
-  "Class 4": 3,
+  "Nothing": 3,
 };
 
 
@@ -101,12 +101,11 @@ const ModelVideo: React.FC<{ onPrediction: (prediction: number) => void }> = ({o
               prev.probability > current.probability ? prev : current
             );
 
-            // console.log("Best Prediction:", bestPrediction);
+            console.log("Best Prediction:", bestPrediction);
 
             // Map the class name to an enum value
             const enumValue = ClassEnum[bestPrediction.className];
             console.log("Mapped Enum Value:", enumValue);
-            onPrediction(bestPrediction.className);
 
             // Send the value to the Arduino
             // if (enumValue !== undefined && enumValue !== pastValueRef.current) {
@@ -130,7 +129,7 @@ const ModelVideo: React.FC<{ onPrediction: (prediction: number) => void }> = ({o
                     console.log("Sent to Arduino:", enumValue);
                     pastValueRef.current = enumValue; // Update the last sent value
                   }
-                }, 1000); // 1-second buffer
+                }, 500); // 1-second buffer
               }
             }
             onPrediction(pastValueRef.current ?? 0);
