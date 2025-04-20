@@ -85,7 +85,7 @@ function App(): React.JSX.Element {
   }
 
   return (
-    <div className="mt-4 app-container text-center mx-auto justify-center flex flex-col relative">
+    <div className="h-screen my-auto app-container text-center mx-auto justify-center flex flex-col relative">
       <div className="header">
         <h1 className="text-4xl">Welcome to GarboGotchi!</h1>
         <p>Help your Tamagotchi grow by sorting trash correctly!</p>
@@ -108,7 +108,7 @@ function App(): React.JSX.Element {
         <img 
           src={skin} // Dynamically change the skin based on user selection
           alt="Tamagotchi"
-          className="mx-auto transition pb-4"
+          className="mx-auto transition pb-4 h-96 w-full object-contain"
           style={{ transform: `scale(${0.5 + level * 0.05})` }}
           draggable="false"
         />

@@ -1,5 +1,5 @@
 import classicSkin from '../assets/skins/lebron.png';
-// import punkSkin from '../assets/wavy-lines.svg';
+import catSkin from '../assets/skins/cat.png';
 // import spaceSkin from '/assets/space-tama.png';
 
 type ShopProps = {
@@ -8,8 +8,8 @@ type ShopProps = {
 };
 
 const skins = [
-  { id: 'classic', name: 'Classic Tamagotchi', image: classicSkin },
-  // { id: 'punk', name: 'Punk Tamagotchi', image: punkSkin },
+  { id: 'classic', name: 'GOAT Tama', image: classicSkin },
+  { id: 'cat', name: 'Cat Tama', image: catSkin },
   // { id: 'space', name: 'Space Tamagotchi', image: spaceSkin },
 ];
 
@@ -25,7 +25,7 @@ const Shop = ({ onClose, onSelectSkin }: ShopProps): React.JSX.Element => {
               className="flex flex-col items-center cursor-pointer"
               onClick={() => onSelectSkin(skin.image)}
             >
-              <img src={skin.image} alt={skin.name} className="w-32 h-32 mb-4" />
+              <img src={skin.image} alt={skin.name} className="w-32 h-32 mb-4 object-contain" />
               <p className="text-xl">{skin.name}</p>
             </div>
           ))}
