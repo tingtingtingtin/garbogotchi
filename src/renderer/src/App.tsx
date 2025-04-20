@@ -14,6 +14,9 @@ import lebronSkin from './assets/skins/lebron.png'
 import cuteMusic from './assets/audio/cute.mp3'
 import goatMusic from './assets/audio/sunshine.mp3'
 import popSfx from './assets/audio/pop.mp3'
+import levelSfx from './assets/audio/levelup.mp3'
+import lebronSfx from './assets/audio/lebron.mp3'
+
 
 function App(): React.JSX.Element {
   const [points, setPoints] = useState(0)
@@ -45,6 +48,7 @@ function App(): React.JSX.Element {
     if (muted || document.hidden) {
       audioRef.current.pause()
     } else {
+      audioRef.current.volume = 0.5
       audioRef.current.play().catch((err) => console.error('Audio playback error:', err)) // Play the audio
     }
 
@@ -72,7 +76,7 @@ function App(): React.JSX.Element {
 
     const interval = setInterval(() => {
       setHappiness((prev) => Math.max(0, prev - 1))
-    }, 30000)
+    }, 5000)
 
     return () => clearInterval(interval)
   }, [])
@@ -82,7 +86,7 @@ function App(): React.JSX.Element {
     setShowShop(false)
   }
 
-  const handlePrediction = (newPrediction: number) => {
+  const handlePrediction = (newPrediction: number): void => {
     // Increase points when the prediction changes
     if (newPrediction !== prediction) {
       setPrediction(newPrediction)
@@ -135,12 +139,18 @@ function App(): React.JSX.Element {
   }
 
   const incrementPoints = (incrementBy: number): void => {
-    setPoints((prevPoints) => prevPoints + incrementBy)
-    setXp((prevXp) => prevXp + incrementBy)
+    if (!exploded) {
+      setPoints((prevPoints) => prevPoints + incrementBy)
+      setXp((prevXp) => prevXp + incrementBy)
+    }
   }
 
   useEffect(() => {
     if (xp >= 100) {
+      if (!muted) {
+        const levelUpAudio = new Audio(levelSfx)
+        levelUpAudio.play().catch((err) => console.error('Level up audio failed: ', err))
+      }
       setLevel((prevLevel) => prevLevel + 1)
       setXp((prevXp) => prevXp - 100)
       setHappiness((prevHappiness) => prevHappiness + 5)
@@ -171,8 +181,8 @@ function App(): React.JSX.Element {
         <h1 className="text-4xl">Welcome to GarboGotchi!</h1>
         <p>Help your Tamagotchi grow by sorting trash correctly!</p>
       </div>
-      <div className="flex mx-auto gap-10">
-        <p>Level: {level}</p>
+      <div className="flex mx-auto gap-10 text-xl">
+        <p>Level {level}</p>
         <p>Points: {points}</p>
       </div>
       <div className="tamagotchi-section flex">

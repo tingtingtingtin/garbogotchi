@@ -22,10 +22,14 @@ const Shop = ({ onClose, onSelectSkin }: ShopProps): React.JSX.Element => {
           {skins.map((skin) => (
             <div
               key={skin.id}
-              className="flex flex-col items-center cursor-pointer"
+              className="flex flex-col items-center cursor-pointer hover:scale-125 transition"
               onClick={() => onSelectSkin(skin.image)}
             >
-              <img src={skin.image} alt={skin.name} className="w-36 h-36 object-contain" />
+              <img
+                src={skin.image}
+                alt={skin.name}
+                className="hover:animate-pulse transition w-36 h-36 object-contain"
+              />
               <p className="text-xl">{skin.name}</p>
             </div>
           ))}
