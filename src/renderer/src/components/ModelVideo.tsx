@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as tmImage from "@teachablemachine/image";
+import { SerialPort } from "serialport";
 
 const MODEL_URL = "https://teachablemachine.withgoogle.com/models/yYg4YjF5G/";
 
@@ -17,6 +18,11 @@ const ClassEnum: { [key: string]: number } = {
   "Recyclable": 1,
   "Compostable": 2,
 };
+
+const port = new SerialPort({
+  path: "/dev/ttyUSB0", // Replace with your Arduino's serial port path
+  baudRate: 9600,
+});
 
 const ModelVideo: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -90,6 +96,26 @@ const ModelVideo: React.FC = () => {
             ctx.drawImage(videoRef.current, 0, 0, MODEL_INPUT_SIZE, MODEL_INPUT_SIZE);
             const preds = await model.predict(canvas);
             setPredictions(preds as Prediction[]);
+            const bestPrediction = preds.reduce((prev, current) =>
+              prev.probability > current.probability ? prev : current
+            );
+
+            console.log("Best Prediction:", bestPrediction);
+
+            // Map the class name to an enum value
+            const enumValue = ClassEnum[bestPrediction.className];
+            console.log("Mapped Enum Value:", enumValue);
+
+            // Send the value to the Arduino
+            if (enumValue !== undefined) {
+              port.write(`${enumValue}\n`, (err) => {
+                if (err) {
+                  console.error("Error writing to serial port:", err);
+                } else {
+                  console.log("Sent to Arduino:", enumValue);
+                }
+              });
+            }
           }
         }
       } catch (err) {

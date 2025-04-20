@@ -24,8 +24,8 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^4.0.0",
     "@teachablemachine/image": "^0.8.5",
-    "@tensorflow/tfjs": "^4.22.0",
-    "electron-updater": "^6.3.9"
+    "electron-updater": "^6.3.9",
+    "serialport": "^13.0.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",
