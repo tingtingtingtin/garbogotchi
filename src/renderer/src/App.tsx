@@ -34,11 +34,26 @@ function App(): React.JSX.Element {
     if (storedData) {
       setPastTamagotchis(JSON.parse(storedData)); // Load past Tamagotchis if they exist
     }
+
+    const interval = setInterval(() => {
+      setHappiness((prev) => Math.max(0, prev - 1));
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleSkinSelect = (selectedSkin: string): void => {
     setSkin(selectedSkin);
     setShowShop(false);
+  };
+
+  const handlePrediction = (newPrediction: number) => {
+    // Increase points when the prediction changes
+    if (newPrediction !== prediction) {
+      setPrediction(newPrediction);
+      const randomValue = Math.floor(Math.random() * 101);
+      incrementPoints(randomValue)
+    }
   };
 
   const clearPopUp = (): void => {
@@ -82,19 +97,22 @@ function App(): React.JSX.Element {
 
   // Function to simulate increasing points (e.g., when trash is placed correctly)
   const incrementPoints = (incrementBy: number): void => {
-    const newPoints = points + incrementBy;
-    const newXp = xp + incrementBy;
-    if (newXp >= 100) {
-      setLevel(level + 1);
-      setXp(newXp - 100); // Carry over excess points to the next level
-    } else {
-      setXp(newXp);
-    }
-    setPoints(newPoints)
+    setPoints((prevPoints) => {
+      const newPoints = prevPoints + incrementBy;
+      return newPoints;
+    });
+    setXp((prevXp) => {
+      const newXp = prevXp + incrementBy;
+      if (newXp >= 100) {
+        setLevel((prevLevel) => prevLevel + 1); // Increase level if XP exceeds 100
+        return newXp - 100; // Carry over excess points to the next level
+      }
+      return newXp;
+    });
   };
 
   const gamble = (): void => {
-    const randomValue = Math.floor(Math.random() * 101); // Generate a random number between 0 and 100
+    const randomValue = Math.floor(Math.random() * 51 + 50); // Generate a random number between 0 and 100
     const randomMod = Math.floor(Math.random() * 11);
     if (randomValue >= 50) {
       incrementPoints(randomValue);
@@ -168,7 +186,7 @@ function App(): React.JSX.Element {
         </div>
       </div>
       <ErrorBoundary>
-        <ModelVideo onPrediction={setPrediction}/>
+        <ModelVideo onPrediction={handlePrediction}/>
       </ErrorBoundary>
 
       <footer className="footer">

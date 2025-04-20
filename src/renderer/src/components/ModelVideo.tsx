@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as tmImage from "@teachablemachine/image";
-// import { SerialPort } from "serialport";
 
 const MODEL_URL = "https://teachablemachine.withgoogle.com/models/rcoM94M0f/";
 
@@ -20,41 +19,34 @@ const ClassEnum: { [key: string]: number } = {
   "Nothing": 3,
 };
 
-
-
-const ModelVideo: React.FC<{ onPrediction: (prediction: number) => void }> = ({onPrediction,}) => {
+const ModelVideo: React.FC<{ onPrediction: (prediction: number) => void }> = ({ onPrediction }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [model, setModel] = useState<tmImage.CustomMobileNet | null>(null);
   const [isCameraOn, setIsCameraOn] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const pastValueRef = useRef<number | null>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const lastValueRef = useRef<number | null>(null);
+  const pastValueRef = useRef<number | null>(null); // Track the last predicted value
+  const lastValueRef = useRef<number | null>(null); // For debouncing the prediction
+  const timerRef = useRef<NodeJS.Timeout | null>(null); // Timer for debouncing prediction
 
-  // Function to initialize the camera
+  // Initialize the camera
   const setupCamera = async () => {
-    console.log("Setting up camera...");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        console.log("Camera stream started");
-        videoRef.current!.srcObject = stream;
-        setIsCameraOn(true);
-        setError(null); // Clear any previous errors
+      videoRef.current!.srcObject = stream;
+      setIsCameraOn(true);
+      setError(null);
     } catch (err) {
       console.error("Failed to access webcam:", err);
       setError("Failed to access webcam. Please allow camera permissions and try again.");
     }
-    console.log("isCameraOn:", isCameraOn);
   };
-  // Function to load the model
+
+  // Load the model
   const loadModel = async () => {
     try {
-      const loadedModel = await tmImage.load(
-        `${MODEL_URL}model.json`,
-        `${MODEL_URL}metadata.json`
-      );
+      const loadedModel = await tmImage.load(`${MODEL_URL}model.json`, `${MODEL_URL}metadata.json`);
       setModel(loadedModel);
     } catch (err) {
       console.error("Error loading model:", err);
@@ -62,82 +54,59 @@ const ModelVideo: React.FC<{ onPrediction: (prediction: number) => void }> = ({o
     }
   };
 
-  // Initial setup: Load model and initialize camera
+  // Setup the camera and model on mount
   useEffect(() => {
-
-    console.log("Loading model and setting up camera...");
     loadModel();
     setupCamera();
 
     return () => {
-      // Stop webcam stream if component unmounts
       if (videoRef.current?.srcObject) {
-        (videoRef.current.srcObject as MediaStream)
-          .getTracks()
-          .forEach((track) => track.stop());
+        (videoRef.current.srcObject as MediaStream).getTracks().forEach((track) => track.stop());
       }
     };
   }, []);
 
-  // Predict loop
+  // Prediction loop
   useEffect(() => {
     let animationFrameId: number;
 
     const predict = async () => {
-      try {
-        if (
-          model &&
-          videoRef.current &&
-          canvasRef.current &&
-          videoRef.current.readyState === 4
-        ) {
-          const canvas = canvasRef.current;
-          const ctx = canvas.getContext("2d");
-          if (ctx) {
-            ctx.drawImage(videoRef.current, 0, 0, MODEL_INPUT_SIZE, MODEL_INPUT_SIZE);
-            const preds = await model.predict(canvas);
-            setPredictions(preds as Prediction[]);
-            const bestPrediction = preds.reduce((prev, current) =>
-              prev.probability > current.probability ? prev : current
-            );
+      if (model && videoRef.current && canvasRef.current && videoRef.current.readyState === 4) {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
 
-            console.log("Best Prediction:", bestPrediction);
+        if (ctx) {
+          ctx.drawImage(videoRef.current, 0, 0, MODEL_INPUT_SIZE, MODEL_INPUT_SIZE);
+          const preds = await model.predict(canvas);
+          setPredictions(preds as Prediction[]);
 
-            // Map the class name to an enum value
-            const enumValue = ClassEnum[bestPrediction.className];
-            console.log("Mapped Enum Value:", enumValue);
+          const bestPrediction = preds.reduce((prev, current) =>
+            prev.probability > current.probability ? prev : current
+          );
 
-            // Send the value to the Arduino
-            // if (enumValue !== undefined && enumValue !== pastValueRef.current) {
-            //   window.electron.ipcRenderer.send('serial-write', enumValue);
-            //   // console.log("Sent to Arduino:", enumValue);
-            // }
+          const enumValue = ClassEnum[bestPrediction.className];
 
-            if (enumValue !== undefined) {
-              if (enumValue !== lastValueRef.current) {
-                // Value has changed, reset the timer
-                lastValueRef.current = enumValue;
-                if (timerRef.current) {
-                  clearTimeout(timerRef.current);
-                }
+          // Debouncing prediction change
+          if (enumValue !== undefined) {
+            if (enumValue !== lastValueRef.current) {
+              lastValueRef.current = enumValue;
 
-                // Start a new timer
-                timerRef.current = setTimeout(() => {
-                  // Only send the value if it persists for 1 second
-                  if (enumValue === lastValueRef.current && enumValue !== pastValueRef.current) {
-                    window.electron.ipcRenderer.send("serial-write", enumValue);
-                    console.log("Sent to Arduino:", enumValue);
-                    pastValueRef.current = enumValue; // Update the last sent value
-                  }
-                }, 500); // 1-second buffer
+              if (timerRef.current) {
+                clearTimeout(timerRef.current);
               }
+
+              // Start a new timer (debouncing)
+              timerRef.current = setTimeout(() => {
+                if (enumValue === lastValueRef.current) {
+                  pastValueRef.current = enumValue; // Save the last sent value
+                  onPrediction(enumValue); // Notify the parent component
+                }
+              }, 1500); // 500ms debounce time
             }
-            onPrediction(pastValueRef.current ?? 0);
           }
         }
-      } catch (err) {
-        console.error("Error during prediction:", err);
       }
+
       animationFrameId = requestAnimationFrame(predict);
     };
 
@@ -152,34 +121,8 @@ const ModelVideo: React.FC<{ onPrediction: (prediction: number) => void }> = ({o
 
   return (
     <div className="hidden">
-        <>
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            width={VIDEO_WIDTH}
-            height={VIDEO_HEIGHT}
-            style={{ border: "1px solid #ccc",  display: "none" }}
-          />
-          <canvas
-            ref={canvasRef}
-            width={MODEL_INPUT_SIZE}
-            height={MODEL_INPUT_SIZE}
-            style={{ display: "none" }}
-          />
-          <h3>Predictions:</h3>
-          <ul>
-            {predictions.map((p, i) => (
-              <li key={i}>
-                {p.className}: {(p.probability * 100).toFixed(2)}%
-              </li>
-            ))}
-          </ul>
-        </>
-        <div>
-          <p>{error || "Loading webcam or model..."}</p>
-          <button onClick={setupCamera}>Retry Camera</button>
-        </div>
+      <video ref={videoRef} autoPlay muted width={VIDEO_WIDTH} height={VIDEO_HEIGHT} style={{ display: "none" }} />
+      <canvas ref={canvasRef} width={MODEL_INPUT_SIZE} height={MODEL_INPUT_SIZE} style={{ display: "none" }} />
     </div>
   );
 };
