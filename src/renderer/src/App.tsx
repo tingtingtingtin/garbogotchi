@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react';
 import tamagotchiImage from './assets/skins/bear.png';
 import PopUp from './components/PopUp';
 import InteractButton from './components/InteractButton';
-import { Heart, Dices, Laugh, Trash2, Bomb, Shirt } from 'lucide-react';
+import { Heart, Dices, Laugh, Trash2, Bomb, Shirt, List } from 'lucide-react';
 import Bar from './components/Bar';
 import explosionGif from './assets/explode.gif'
 import Shop from './components/Shop';
 import ThoughtBubble from './components/ThoughtBubble';
+import History from './components/History';
 
 function App(): React.JSX.Element {
   const [points, setPoints] = useState(0);
@@ -22,14 +23,41 @@ function App(): React.JSX.Element {
   const [exploded, setExploded] = useState(false);
   const [skin, setSkin] = useState(tamagotchiImage);
   const [showShop, setShowShop] = useState(false);
-  const [prediction, setPrediction] = useState<string | null>(null);
+  const [prediction, setPrediction] = useState<number>(3);
+
+  const [showHistory, setShowHistory] = useState(false);
+  const [pastTamagotchis, setPastTamagotchis] = useState<{ level: number; xp: number }[]>([]);
+
+  // Load past data from localStorage
+  useEffect(() => {
+    const storedData = localStorage.getItem("pastTamagotchis");
+    if (storedData) {
+      setPastTamagotchis(JSON.parse(storedData)); // Load past Tamagotchis if they exist
+    }
+  }, []);
 
   const handleSkinSelect = (selectedSkin: string): void => {
     setSkin(selectedSkin);
     setShowShop(false);
   };
 
-  const clearPopUp = (): void => setPopUp({ header: '', message: '' });
+  const clearPopUp = (): void => {
+    setPopUp({ header: "", message: "" }); // Clear the popup message and header
+    if (exploded) {
+      resetStats(); // Reset stats only if the Tamagotchi exploded
+      setExploded(false); // Set exploded to false after resetting stats
+    }
+  };
+
+  const resetStats = (): void => {
+    const newTamagotchi = { level, xp };
+    const updatedHistory = [...pastTamagotchis, newTamagotchi]; // Add current Tamagotchi to history
+    setPastTamagotchis(updatedHistory);
+    setPoints(0);
+    setLevel(1);
+    setHappiness(80);
+    setXp(0);
+  };
 
   useEffect(() => {
     if (happiness <= 0) explode();
@@ -45,16 +73,11 @@ function App(): React.JSX.Element {
     clearPopUp();
     setExploded(true);
     setTimeout(() => {
-      setExploded(false);
       setPopUp({
-        header: 'Oh no!',
-        message: 'Your Tamagotchi exploded! All stats have been reset.'
+      header: "Oh no!",
+      message: "Your Tamagotchi exploded! All stats have been reset."
       });
-      setPoints(0);
-      setLevel(1);
-      setHappiness(80);
-      setXp(0);
-    }, 1500); // Set duration of explosion (e.g., 2 seconds)
+    }, 2000); // Delay for 3 seconds
   };
 
   // Function to simulate increasing points (e.g., when trash is placed correctly)
@@ -127,7 +150,7 @@ function App(): React.JSX.Element {
           </div>
         )}
         <div className="flex gap-8 right-[2px] absolute mt-6">
-          {prediction && <ThoughtBubble prediction={prediction} />}
+          {prediction < 3 && !exploded && <ThoughtBubble prediction={prediction} />}
         </div>
       </div>
 
@@ -141,6 +164,7 @@ function App(): React.JSX.Element {
           <InteractButton Icon={Dices} onClick={gamble}/>
           <InteractButton Icon={Shirt} onClick={() => setShowShop(true)} />
           <InteractButton Icon={Bomb} onClick={explode}/>
+          <InteractButton Icon={List} onClick={() => setShowHistory(!showHistory)} />
         </div>
       </div>
       <ErrorBoundary>
@@ -151,6 +175,10 @@ function App(): React.JSX.Element {
         <p>GarboGotchi</p>
       </footer>
       {showShop && <Shop onClose={() => setShowShop(false)} onSelectSkin={handleSkinSelect} />}
+
+      {showHistory && (
+        <History onClose={() => setShowHistory(false)} pastTamagotchis={pastTamagotchis} />
+      )}
     </div>
   );
 }

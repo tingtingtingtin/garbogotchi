@@ -3,20 +3,20 @@ import { Trash2, Recycle, Leaf } from "lucide-react"; // Icons for Trash, Recycl
 import thoughtBubble from "../assets/thought.png"
 
 type ThoughtBubbleProps = {
-  prediction: string;
+  prediction: number;
 };
 
 const ThoughtBubble: React.FC<ThoughtBubbleProps> = ({ prediction }) => {
   // Determine the icon based on the prediction
   let Icon;
   switch (prediction) {
-    case "Trash":
+    case 0:
       Icon = Trash2;
       break;
-    case "Recycleable":
+    case 1:
       Icon = Recycle;
       break;
-    case "Compost":
+    case 2:
       Icon = Leaf;
       break;
     default:
