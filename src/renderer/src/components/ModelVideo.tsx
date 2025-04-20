@@ -17,6 +17,7 @@ const ClassEnum: { [key: string]: number } = {
   "Trash": 0,
   "Recycleable": 1,
   "Compost": 2,
+  "Nothing": 3,
 };
 
 
