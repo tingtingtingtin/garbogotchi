@@ -24,7 +24,7 @@ const ThoughtBubble: React.FC<ThoughtBubbleProps> = ({ prediction }) => {
   }
 
   return (
-    <div className="">
+    <div className={prediction === 3 ? `hidden` : ''}>
       <img src={thoughtBubble} alt="Thought Bubble" className="w-52 object-contain" />
       {Icon && (
         <div
