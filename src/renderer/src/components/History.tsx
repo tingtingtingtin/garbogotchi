@@ -32,12 +32,11 @@ const History = ({ onClose, pastTamagotchis }: HistoryProps): React.JSX.Element 
               {pastTamagotchis.map((tamagotchi, index) => (
                 <div
                   key={index}
-                  className="flex justify-between items-center p-4 bg-gray-100 rounded-lg"
+                  className="flex flex-col w-full text-center items-center p-4 bg-gray-100 rounded-lg"
                 >
-                  <div>
-                    <p className="text-lg">Level: {tamagotchi.level}</p>
-                    <p className="text-lg">Points: {tamagotchi.points}</p>
-                  </div>
+                  <p className="text-lg">Level: {tamagotchi.level}</p>
+                  <p className="text-lg">Points: {tamagotchi.points}</p>
+
                 </div>
               ))}
             </div>

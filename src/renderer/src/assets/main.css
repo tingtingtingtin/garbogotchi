@@ -46,6 +46,11 @@ body {
   animation: moveBackground 40s linear infinite alternate;
   background-size: fill;
   user-select: none;
+  cursor: url('./cursor.png'), auto;
+}
+
+button, a, .clickable-element, .cursor-pointer {
+  cursor: url('./pointer.png'), pointer;
 }
 
 code {
