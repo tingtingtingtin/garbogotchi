@@ -21,7 +21,7 @@ const ClassEnum: { [key: string]: number } = {
 
 
 
-const ModelVideo: React.FC = () => {
+const ModelVideo: React.FC<{ onPrediction: (prediction: string) => void }> = ({onPrediction,}) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
@@ -102,6 +102,7 @@ const ModelVideo: React.FC = () => {
             // Map the class name to an enum value
             let enumValue = ClassEnum[bestPrediction.className];
             console.log("Mapped Enum Value:", enumValue);
+            onPrediction(bestPrediction.className);
 
             // Send the value to the Arduino
             if (enumValue !== undefined) {
@@ -126,7 +127,7 @@ const ModelVideo: React.FC = () => {
   }, [model, isCameraOn]);
 
   return (
-    <div>
+    <div className="hidden">
         <>
           <video
             ref={videoRef}
@@ -134,7 +135,7 @@ const ModelVideo: React.FC = () => {
             muted
             width={VIDEO_WIDTH}
             height={VIDEO_HEIGHT}
-            style={{ border: "1px solid #ccc",  display: "block" }}
+            style={{ border: "1px solid #ccc",  display: "none" }}
           />
           <canvas
             ref={canvasRef}
