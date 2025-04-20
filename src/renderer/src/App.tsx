@@ -13,6 +13,7 @@ import History from './components/History'
 import lebronSkin from './assets/skins/lebron.png'
 import cuteMusic from './assets/audio/cute.mp3'
 import goatMusic from './assets/audio/sunshine.mp3'
+import popSfx from './assets/audio/pop.mp3'
 
 function App(): React.JSX.Element {
   const [points, setPoints] = useState(0)
@@ -30,7 +31,7 @@ function App(): React.JSX.Element {
   const [prediction, setPrediction] = useState<number>(3)
   const [muted, setMuted] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
-  const [pastTamagotchis, setPastTamagotchis] = useState<{ level: number; xp: number }[]>([])
+  const [pastTamagotchis, setPastTamagotchis] = useState<{ level: number; points: number }[]>([])
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
@@ -85,7 +86,7 @@ function App(): React.JSX.Element {
     // Increase points when the prediction changes
     if (newPrediction !== prediction) {
       setPrediction(newPrediction)
-      const randomValue = Math.floor(Math.random() * 101)
+      const randomValue = Math.floor(Math.random() * 71 + 20)
       incrementPoints(randomValue)
     }
   }
@@ -99,7 +100,7 @@ function App(): React.JSX.Element {
   }
 
   const resetStats = (): void => {
-    const newTamagotchi = { level, xp }
+    const newTamagotchi = { level, points }
     const updatedHistory = [...pastTamagotchis, newTamagotchi]
     setPastTamagotchis(updatedHistory)
     setPoints(0)
@@ -119,6 +120,10 @@ function App(): React.JSX.Element {
   }, [level, happiness])
 
   const explode = (): void => {
+    if (!muted) {
+      const popAudio = new Audio(popSfx)
+      popAudio.play().catch((err) => console.error('Pop audio failed: ', err))
+    }
     clearPopUp()
     setExploded(true)
     setTimeout(() => {
@@ -138,11 +143,12 @@ function App(): React.JSX.Element {
     if (xp >= 100) {
       setLevel((prevLevel) => prevLevel + 1)
       setXp((prevXp) => prevXp - 100)
+      setHappiness((prevHappiness) => prevHappiness + 5)
     }
   }, [xp])
 
   const gamble = (): void => {
-    const randomValue = Math.floor(Math.random() * 51 + 50) // Generate a random number between 0 and 100
+    const randomValue = Math.floor(Math.random() * 101) // Generate a random number between 0 and 100
     const randomMod = Math.floor(Math.random() * 11)
     if (randomValue >= 50) {
       incrementPoints(randomValue)
@@ -212,7 +218,7 @@ function App(): React.JSX.Element {
             hover={setHovering}
             label="Give Love"
             Icon={Heart}
-            onClick={() => incrementPoints(10)}
+            onClick={() => setHappiness((prevHappiness) => prevHappiness + 5)}
           />
           <InteractButton hover={setHovering} label="Gamble" Icon={Dices} onClick={gamble} />
           <InteractButton
