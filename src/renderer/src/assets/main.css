@@ -4,14 +4,45 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --tg-brown: theme('colors.tg.brown');
+}
+
+@font-face {
+  font-family: 'ACFont';
+  src: url('./fonts/Merchant_Copy.ttf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* styles.css */
+.pixel-border {
+  position: relative;
+  border: 2px solid var(--tg-brown);
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px white, 0 0 0 4px var(--tg-brown);
+}
+
+@keyframes moveBackground {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 20% 100%;
+  }
+}
 
 body {
+  font-family: 'ACFont', sans-serif;
+  font-size: medium;
+  color: var(--tg-brown);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   background-image: url('./wavy-lines.svg');
-  background-size: cover;
+  animation: moveBackground 40s linear infinite alternate;
+  background-size: fill;
   user-select: none;
 }
 
