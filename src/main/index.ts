@@ -2,10 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { SerialPort } from "serialport";
-
-console.log("test");
-
+import { SerialPort } from 'serialport'
 
 const port = new SerialPort({
   path: 'COM3', // Replace with your Arduino's serial port path
@@ -38,12 +35,11 @@ function createWindow(): void {
       sandbox: false,
       contextIsolation: false, // Disable context isolation (only for development)
       webSecurity: false, // Disable web security (only for development)
-      enableBlinkFeatures: 'MediaStream', // Enable MediaStream features
-
+      enableBlinkFeatures: 'MediaStream' // Enable MediaStream features
     }
   })
 
-  const session = mainWindow.webContents.session;
+  const session = mainWindow.webContents.session
   session.webRequest.onHeadersReceived((details, callback) => {
     // console.log('Applying CSP...');
     callback({
@@ -53,18 +49,18 @@ function createWindow(): void {
           "script-src 'self' 'unsafe-eval' 'unsafe-inline'; object-src 'self';"
         ]
       }
-    });
-  });
+    })
+  })
   session.setPermissionRequestHandler((_, permission, callback) => {
-    console.log('Media permission requested');
+    console.log('Media permission requested')
     if (permission === 'media') {
-    console.log('Media permission granted');
-      callback(true); // Allow webcam access
+      console.log('Media permission granted')
+      callback(true) // Allow webcam access
     } else {
-      console.log('Media permission denied');
-      callback(false); // Deny other permissions
+      console.log('Media permission denied')
+      callback(false) // Deny other permissions
     }
-  });
+  })
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -74,8 +70,6 @@ function createWindow(): void {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
-
-
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
@@ -89,15 +83,15 @@ function createWindow(): void {
 
 
 ipcMain.on('serial-write', (event, data) => {
-  console.log('Received data to send to Arduino:', data);
+  console.log('Received data to send to Arduino:', data)
   port.write(`${data}\n`, (err) => {
     if (err) {
-      console.error('Error writing to serial port:', err);
+      console.error('Error writing to serial port:', err)
     } else {
-      console.log('Data sent to Arduino:', data);
+      console.log('Data sent to Arduino:', data)
     }
-  });
-});
+  })
+})
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.

@@ -1,0 +1,42 @@
+<!-- renderer/video.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Stream</title>
+    <style>
+      body {
+        margin: 0;
+        background-color: black;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      video {
+        max-width: 100%;
+        height: auto;
+        object-fit: cover;
+      }
+    </style>
+  </head>
+  <body>
+    <video id="videoElement" autoplay muted playsinline></video>
+    <script>
+      const videoElement = document.getElementById('videoElement');
+      const setupCamera = async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: 640, height: 480 }
+          });
+          videoElement.srcObject = stream;
+        } catch (err) {
+          console.error('Failed to access webcam:', err);
+        }
+      };
+
+      setupCamera();
+    </script>
+  </body>
+</html>
