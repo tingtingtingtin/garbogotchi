@@ -97,19 +97,16 @@ function App(): React.JSX.Element {
   }
 
   const incrementPoints = (incrementBy: number): void => {
-    setPoints((prevPoints) => {
-      const newPoints = prevPoints + incrementBy
-      return newPoints
-    })
-    setXp((prevXp) => {
-      const newXp = prevXp + incrementBy
-      if (newXp >= 100) {
-        setLevel((prevLevel) => prevLevel + 1)
-        return newXp - 100
-      }
-      return newXp
-    })
-  }
+    setPoints((prevPoints) => prevPoints + incrementBy);
+    setXp((prevXp) => prevXp + incrementBy);
+  };
+
+  useEffect(() => {
+    if (xp >= 100) {
+      setLevel((prevLevel) => prevLevel + 1);
+      setXp((prevXp) => prevXp - 100);
+    }
+  }, [xp]);
 
   const gamble = (): void => {
     const randomValue = Math.floor(Math.random() * 51 + 50) // Generate a random number between 0 and 100
