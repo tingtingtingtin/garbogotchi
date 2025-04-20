@@ -28,6 +28,7 @@ const ModelVideo: React.FC = () => {
   const [model, setModel] = useState<tmImage.CustomMobileNet | null>(null);
   const [isCameraOn, setIsCameraOn] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const pastValueRef = useRef<number | null>(null);
 
   // Function to initialize the camera
   const setupCamera = async () => {
@@ -97,17 +98,18 @@ const ModelVideo: React.FC = () => {
               prev.probability > current.probability ? prev : current
             );
 
-            console.log("Best Prediction:", bestPrediction);
+            //console.log("Best Prediction:", bestPrediction);
 
             // Map the class name to an enum value
             let enumValue = ClassEnum[bestPrediction.className];
-            console.log("Mapped Enum Value:", enumValue);
-
+            //console.log("Mapped Enum Value:", enumValue);
+            
             // Send the value to the Arduino
-            if (enumValue !== undefined) {
+            if (enumValue !== undefined && enumValue !== pastValueRef.current) {
               window.electron.ipcRenderer.send('serial-write', enumValue);
-              console.log("Sent to Arduino:", enumValue);
+              // console.log("Sent to Arduino:", enumValue);
             }
+            pastValueRef.current = enumValue;
           }
         }
       } catch (err) {
