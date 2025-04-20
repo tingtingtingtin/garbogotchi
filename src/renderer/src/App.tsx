@@ -1,15 +1,18 @@
 import ModelVideo from './components/ModelVideo'
 import ErrorBoundary from './components/ErrorBoundary'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import tamagotchiImage from './assets/skins/bear.png'
 import PopUp from './components/PopUp'
 import InteractButton from './components/InteractButton'
-import { Heart, Dices, Laugh, Trash2, Bomb, Shirt, List } from 'lucide-react'
+import { Heart, Dices, Laugh, Trash2, Bomb, Shirt, List, Volume2, VolumeOff } from 'lucide-react'
 import Bar from './components/Bar'
 import explosionGif from './assets/explode.gif'
 import Shop from './components/Shop'
 import ThoughtBubble from './components/ThoughtBubble'
 import History from './components/History'
+import lebronSkin from './assets/skins/lebron.png'
+import cuteMusic from './assets/audio/cute.mp3'
+import goatMusic from './assets/audio/sunshine.mp3'
 
 function App(): React.JSX.Element {
   const [points, setPoints] = useState(0)
@@ -25,15 +28,45 @@ function App(): React.JSX.Element {
   const [skin, setSkin] = useState(tamagotchiImage)
   const [showShop, setShowShop] = useState(false)
   const [prediction, setPrediction] = useState<number>(3)
-
+  const [muted, setMuted] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
   const [pastTamagotchis, setPastTamagotchis] = useState<{ level: number; xp: number }[]>([])
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  // Load past data from localStorage
+  useEffect(() => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio(skin === lebronSkin ? goatMusic : cuteMusic)
+      audioRef.current.loop = true
+    } else {
+      audioRef.current.src = skin === lebronSkin ? goatMusic : cuteMusic
+    }
+
+    if (muted || document.hidden) {
+      audioRef.current.pause()
+    } else {
+      audioRef.current.play().catch((err) => console.error('Audio playback error:', err)) // Play the audio
+    }
+
+    const handleVisibilityChange = (): void => {
+      if (document.hidden) {
+        audioRef.current?.pause()
+      } else if (!muted) {
+        audioRef.current?.play().catch((err) => console.error('Audio playback error:', err))
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      audioRef.current?.pause() // Cleanup: pause the audio when the component unmounts
+    }
+  }, [muted, skin])
+
   useEffect(() => {
     const storedData = localStorage.getItem('pastTamagotchis')
     if (storedData) {
-      setPastTamagotchis(JSON.parse(storedData)) // Load past Tamagotchis if they exist
+      setPastTamagotchis(JSON.parse(storedData))
     }
 
     const interval = setInterval(() => {
@@ -97,16 +130,16 @@ function App(): React.JSX.Element {
   }
 
   const incrementPoints = (incrementBy: number): void => {
-    setPoints((prevPoints) => prevPoints + incrementBy);
-    setXp((prevXp) => prevXp + incrementBy);
-  };
+    setPoints((prevPoints) => prevPoints + incrementBy)
+    setXp((prevXp) => prevXp + incrementBy)
+  }
 
   useEffect(() => {
     if (xp >= 100) {
-      setLevel((prevLevel) => prevLevel + 1);
-      setXp((prevXp) => prevXp - 100);
+      setLevel((prevLevel) => prevLevel + 1)
+      setXp((prevXp) => prevXp - 100)
     }
-  }, [xp]);
+  }, [xp])
 
   const gamble = (): void => {
     const randomValue = Math.floor(Math.random() * 51 + 50) // Generate a random number between 0 and 100
@@ -194,6 +227,12 @@ function App(): React.JSX.Element {
             label="History"
             Icon={List}
             onClick={() => setShowHistory(!showHistory)}
+          />
+          <InteractButton
+            hover={setHovering}
+            label={muted ? 'Unmute' : 'Mute'}
+            Icon={muted ? VolumeOff : Volume2}
+            onClick={() => setMuted(!muted)}
           />
         </div>
       </div>
