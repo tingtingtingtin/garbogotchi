@@ -13,9 +13,36 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      contextIsolation: false, // Disable context isolation (only for development)
+      webSecurity: false, // Disable web security (only for development)
+      enableBlinkFeatures: 'MediaStream', // Enable MediaStream features
+
     }
   })
+
+  const session = mainWindow.webContents.session;
+  session.webRequest.onHeadersReceived((details, callback) => {
+    // console.log('Applying CSP...');
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "script-src 'self' 'unsafe-eval' 'unsafe-inline'; object-src 'self';"
+        ]
+      }
+    });
+  });
+  session.setPermissionRequestHandler((_, permission, callback) => {
+    console.log('Media permission requested');
+    if (permission === 'media') {
+    console.log('Media permission granted');
+      callback(true); // Allow webcam access
+    } else {
+      console.log('Media permission denied');
+      callback(false); // Deny other permissions
+    }
+  });
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -25,6 +52,8 @@ function createWindow(): void {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
+
+
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.

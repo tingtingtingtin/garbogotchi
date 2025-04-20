@@ -23,7 +23,9 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^4.0.0",
+    "@teachablemachine/image": "^0.8.5",
     "electron-updater": "^6.3.9",
+    "serialport": "^13.0.0"
     "lucide-react": "^0.501.0"
   },
   "devDependencies": {
@@ -49,5 +51,13 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
     "vite": "^6.2.6"
+  },
+  "build": {
+    "mac": {
+      "extendInfo": {
+        "NSCameraUsageDescription": "We need access to your camera for video functionality.",
+        "NSCameraUseContinuityCameraDeviceType": true
+      }
+    }
   }
 }

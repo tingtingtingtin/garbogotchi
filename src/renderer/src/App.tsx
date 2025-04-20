@@ -1,3 +1,5 @@
+import ModelVideo from './components/ModelVideo';
+import ErrorBoundary from './components/ErrorBoundary';
 import { useState, useEffect } from 'react';
 import tamagotchiImage from './assets/skins/lebron.png';
 import PopUp from './components/PopUp';
@@ -135,6 +137,12 @@ function App(): React.JSX.Element {
           <InteractButton Icon={Shirt} onClick={() => setShowShop(true)} />
           <InteractButton Icon={Bomb} onClick={explode}/>
         </div>
+      </div>
+      <div>
+        <h1>Electron + React + Teachable Machine</h1>
+        <ErrorBoundary>
+          <ModelVideo />
+        </ErrorBoundary>
       </div>
 
       <footer className="footer">
