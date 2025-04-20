@@ -2,6 +2,13 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { SerialPort } from "serialport";
+
+
+const port = new SerialPort({
+  path: '/dev/ttyUSB0', // Replace with your Arduino's serial port path
+  baudRate: 9600,
+});
 
 function createWindow(): void {
   // Create the browser window.
@@ -64,6 +71,16 @@ function createWindow(): void {
   }
 }
 
+ipcMain.on('serial-write', (event, data) => {
+  console.log('Received data to send to Arduino:', data);
+  port.write(`${data}\n`, (err) => {
+    if (err) {
+      console.error('Error writing to serial port:', err);
+    } else {
+      console.log('Data sent to Arduino:', data);
+    }
+  });
+});
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
