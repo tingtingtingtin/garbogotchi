@@ -17,6 +17,7 @@ const ClassEnum: { [key: string]: number } = {
   "Trash": 0,
   "Recycleable": 1,
   "Compost": 2,
+  "Class 4": 3,
 };
 
 
@@ -29,6 +30,8 @@ const ModelVideo: React.FC<{ onPrediction: (prediction: number) => void }> = ({o
   const [isCameraOn, setIsCameraOn] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const pastValueRef = useRef<number | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastValueRef = useRef<number | null>(null);
 
   // Function to initialize the camera
   const setupCamera = async () => {
@@ -98,19 +101,39 @@ const ModelVideo: React.FC<{ onPrediction: (prediction: number) => void }> = ({o
               prev.probability > current.probability ? prev : current
             );
 
-            //console.log("Best Prediction:", bestPrediction);
+            // console.log("Best Prediction:", bestPrediction);
 
             // Map the class name to an enum value
             const enumValue = ClassEnum[bestPrediction.className];
             console.log("Mapped Enum Value:", enumValue);
+            onPrediction(bestPrediction.className);
 
             // Send the value to the Arduino
-            if (enumValue !== undefined && enumValue !== pastValueRef.current) {
-              window.electron.ipcRenderer.send('serial-write', enumValue);
-              // console.log("Sent to Arduino:", enumValue);
+            // if (enumValue !== undefined && enumValue !== pastValueRef.current) {
+            //   window.electron.ipcRenderer.send('serial-write', enumValue);
+            //   // console.log("Sent to Arduino:", enumValue);
+            // }
+
+            if (enumValue !== undefined) {
+              if (enumValue !== lastValueRef.current) {
+                // Value has changed, reset the timer
+                lastValueRef.current = enumValue;
+                if (timerRef.current) {
+                  clearTimeout(timerRef.current);
+                }
+
+                // Start a new timer
+                timerRef.current = setTimeout(() => {
+                  // Only send the value if it persists for 1 second
+                  if (enumValue === lastValueRef.current && enumValue !== pastValueRef.current) {
+                    window.electron.ipcRenderer.send("serial-write", enumValue);
+                    console.log("Sent to Arduino:", enumValue);
+                    pastValueRef.current = enumValue; // Update the last sent value
+                  }
+                }, 1000); // 1-second buffer
+              }
             }
             onPrediction(pastValueRef.current ?? 0);
-            pastValueRef.current = enumValue;
           }
         }
       } catch (err) {
