@@ -1,7 +1,7 @@
 import ModelVideo from './components/ModelVideo';
 import ErrorBoundary from './components/ErrorBoundary';
 import { useState, useEffect } from 'react';
-import tamagotchiImage from './assets/skins/lebron.png';
+import tamagotchiImage from './assets/skins/bear.png';
 import PopUp from './components/PopUp';
 import InteractButton from './components/InteractButton';
 import { Heart, Dices, Laugh, Trash2, Bomb, Shirt } from 'lucide-react';
