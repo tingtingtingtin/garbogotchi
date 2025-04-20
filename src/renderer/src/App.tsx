@@ -1,131 +1,131 @@
-import ModelVideo from './components/ModelVideo';
-import ErrorBoundary from './components/ErrorBoundary';
-import { useState, useEffect } from 'react';
-import tamagotchiImage from './assets/skins/bear.png';
-import PopUp from './components/PopUp';
-import InteractButton from './components/InteractButton';
-import { Heart, Dices, Laugh, Trash2, Bomb, Shirt, List } from 'lucide-react';
-import Bar from './components/Bar';
+import ModelVideo from './components/ModelVideo'
+import ErrorBoundary from './components/ErrorBoundary'
+import { useState, useEffect } from 'react'
+import tamagotchiImage from './assets/skins/bear.png'
+import PopUp from './components/PopUp'
+import InteractButton from './components/InteractButton'
+import { Heart, Dices, Laugh, Trash2, Bomb, Shirt, List } from 'lucide-react'
+import Bar from './components/Bar'
 import explosionGif from './assets/explode.gif'
-import Shop from './components/Shop';
-import ThoughtBubble from './components/ThoughtBubble';
-import History from './components/History';
+import Shop from './components/Shop'
+import ThoughtBubble from './components/ThoughtBubble'
+import History from './components/History'
 
 function App(): React.JSX.Element {
-  const [points, setPoints] = useState(0);
-  const [level, setLevel] = useState(1);
-  const [happiness, setHappiness] = useState(80);
-  const [xp, setXp] = useState(0);
+  const [points, setPoints] = useState(0)
+  const [level, setLevel] = useState(1)
+  const [happiness, setHappiness] = useState(80)
+  const [xp, setXp] = useState(0)
+  const [hovering, setHovering] = useState('Menu')
   const [popUp, setPopUp] = useState({
     header: 'Instructions',
     message: 'Your Tamagotchi loves cleanliness! Place trash in the right bins to earn points.'
-  });
-  const [exploded, setExploded] = useState(false);
-  const [skin, setSkin] = useState(tamagotchiImage);
-  const [showShop, setShowShop] = useState(false);
-  const [prediction, setPrediction] = useState<number>(3);
+  })
+  const [exploded, setExploded] = useState(false)
+  const [skin, setSkin] = useState(tamagotchiImage)
+  const [showShop, setShowShop] = useState(false)
+  const [prediction, setPrediction] = useState<number>(3)
 
-  const [showHistory, setShowHistory] = useState(false);
-  const [pastTamagotchis, setPastTamagotchis] = useState<{ level: number; xp: number }[]>([]);
+  const [showHistory, setShowHistory] = useState(false)
+  const [pastTamagotchis, setPastTamagotchis] = useState<{ level: number; xp: number }[]>([])
 
   // Load past data from localStorage
   useEffect(() => {
-    const storedData = localStorage.getItem("pastTamagotchis");
+    const storedData = localStorage.getItem('pastTamagotchis')
     if (storedData) {
-      setPastTamagotchis(JSON.parse(storedData)); // Load past Tamagotchis if they exist
+      setPastTamagotchis(JSON.parse(storedData)) // Load past Tamagotchis if they exist
     }
 
     const interval = setInterval(() => {
-      setHappiness((prev) => Math.max(0, prev - 1));
-    }, 30000);
+      setHappiness((prev) => Math.max(0, prev - 1))
+    }, 30000)
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => clearInterval(interval)
+  }, [])
 
   const handleSkinSelect = (selectedSkin: string): void => {
-    setSkin(selectedSkin);
-    setShowShop(false);
-  };
+    setSkin(selectedSkin)
+    setShowShop(false)
+  }
 
   const handlePrediction = (newPrediction: number) => {
     // Increase points when the prediction changes
     if (newPrediction !== prediction) {
-      setPrediction(newPrediction);
-      const randomValue = Math.floor(Math.random() * 101);
+      setPrediction(newPrediction)
+      const randomValue = Math.floor(Math.random() * 101)
       incrementPoints(randomValue)
     }
-  };
+  }
 
   const clearPopUp = (): void => {
-    setPopUp({ header: "", message: "" }); // Clear the popup message and header
+    setPopUp({ header: '', message: '' })
     if (exploded) {
-      resetStats(); // Reset stats only if the Tamagotchi exploded
-      setExploded(false); // Set exploded to false after resetting stats
+      resetStats()
+      setExploded(false)
     }
-  };
+  }
 
   const resetStats = (): void => {
-    const newTamagotchi = { level, xp };
-    const updatedHistory = [...pastTamagotchis, newTamagotchi]; // Add current Tamagotchi to history
-    setPastTamagotchis(updatedHistory);
-    setPoints(0);
-    setLevel(1);
-    setHappiness(80);
-    setXp(0);
-  };
+    const newTamagotchi = { level, xp }
+    const updatedHistory = [...pastTamagotchis, newTamagotchi]
+    setPastTamagotchis(updatedHistory)
+    setPoints(0)
+    setLevel(1)
+    setHappiness(80)
+    setXp(0)
+  }
 
   useEffect(() => {
-    if (happiness <= 0) explode();
+    if (happiness <= 0) explode()
     if (level >= 10) {
-      const chance = Math.random(); // Generate a random number between 0 and 1
-      if (chance < 0.1) { // 10% chance for the Tamagotchi to explode
-        explode();
+      const chance = Math.random()
+      if (chance < 0.1) {
+        explode()
       }
     }
-  }, [level, happiness]);
+  }, [level, happiness])
 
   const explode = (): void => {
-    clearPopUp();
-    setExploded(true);
+    clearPopUp()
+    setExploded(true)
     setTimeout(() => {
       setPopUp({
-      header: "Oh no!",
-      message: "Your Tamagotchi exploded! All stats have been reset."
-      });
-    }, 2000); // Delay for 3 seconds
-  };
+        header: 'Oh no!',
+        message: 'Your Tamagotchi exploded! All stats have been reset.'
+      })
+    }, 2000)
+  }
 
-  // Function to simulate increasing points (e.g., when trash is placed correctly)
   const incrementPoints = (incrementBy: number): void => {
     setPoints((prevPoints) => {
-      const newPoints = prevPoints + incrementBy;
-      return newPoints;
-    });
+      const newPoints = prevPoints + incrementBy
+      return newPoints
+    })
     setXp((prevXp) => {
-      const newXp = prevXp + incrementBy;
+      const newXp = prevXp + incrementBy
       if (newXp >= 100) {
-        setLevel((prevLevel) => prevLevel + 1); // Increase level if XP exceeds 100
-        return newXp - 100; // Carry over excess points to the next level
+        setLevel((prevLevel) => prevLevel + 1)
+        return newXp - 100
       }
-      return newXp;
-    });
-  };
+      return newXp
+    })
+  }
 
   const gamble = (): void => {
-    const randomValue = Math.floor(Math.random() * 51 + 50); // Generate a random number between 0 and 100
-    const randomMod = Math.floor(Math.random() * 11);
+    const randomValue = Math.floor(Math.random() * 51 + 50) // Generate a random number between 0 and 100
+    const randomMod = Math.floor(Math.random() * 11)
     if (randomValue >= 50) {
-      incrementPoints(randomValue);
+      incrementPoints(randomValue)
       setPopUp({
         header: `You rolled a ${randomValue}`,
         message: `You gambled and got ${randomValue + randomMod} XP!`
-      });
+      })
     } else {
-      setHappiness((prev) => Math.max(0, prev - 10 - randomMod)); // Decrease happiness if the roll is low
+      setHappiness((prev) => Math.max(0, prev - 10 - randomMod)) // Decrease happiness if the roll is low
       setPopUp({
         header: `You rolled a ${randomValue}`,
         message: `You gambled and lost! Your tamagotchi is upset :(`
-      });
+      })
     }
   }
 
@@ -150,7 +150,7 @@ function App(): React.JSX.Element {
             <Trash2 className="mt-2" />
           </div>
         </div>
-        <img 
+        <img
           src={skin} // Dynamically change the skin based on user selection
           alt="Tamagotchi"
           className="mx-auto transition pb-4 h-96 w-full object-contain"
@@ -178,27 +178,40 @@ function App(): React.JSX.Element {
 
       <div>
         <div className="flex flex-row justify-evenly mb-4">
-          <InteractButton Icon={Heart} onClick={() => incrementPoints(10)} />
-          <InteractButton Icon={Dices} onClick={gamble}/>
-          <InteractButton Icon={Shirt} onClick={() => setShowShop(true)} />
-          <InteractButton Icon={Bomb} onClick={explode}/>
-          <InteractButton Icon={List} onClick={() => setShowHistory(!showHistory)} />
+          <InteractButton
+            hover={setHovering}
+            label="Give Love"
+            Icon={Heart}
+            onClick={() => incrementPoints(10)}
+          />
+          <InteractButton hover={setHovering} label="Gamble" Icon={Dices} onClick={gamble} />
+          <InteractButton
+            hover={setHovering}
+            label="Shop"
+            Icon={Shirt}
+            onClick={() => setShowShop(true)}
+          />
+          <InteractButton hover={setHovering} label="Blow Up" Icon={Bomb} onClick={explode} />
+          <InteractButton
+            hover={setHovering}
+            label="History"
+            Icon={List}
+            onClick={() => setShowHistory(!showHistory)}
+          />
         </div>
       </div>
       <ErrorBoundary>
-        <ModelVideo onPrediction={handlePrediction}/>
+        <ModelVideo onPrediction={handlePrediction} />
       </ErrorBoundary>
 
-      <footer className="footer">
-        <p>GarboGotchi</p>
-      </footer>
+      <p>{hovering}</p>
       {showShop && <Shop onClose={() => setShowShop(false)} onSelectSkin={handleSkinSelect} />}
 
       {showHistory && (
         <History onClose={() => setShowHistory(false)} pastTamagotchis={pastTamagotchis} />
       )}
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

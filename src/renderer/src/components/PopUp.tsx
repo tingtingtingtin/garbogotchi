@@ -23,7 +23,7 @@ const PopUp = ({
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default PopUp;
+export default PopUp

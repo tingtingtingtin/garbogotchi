@@ -1,11 +1,11 @@
-export {};
+export {}
 
 declare global {
   interface Window {
     electron: {
       process: {
-        versions: NodeJS.ProcessVersions;
-      };
-    };
+        versions: NodeJS.ProcessVersions
+      }
+    }
   }
 }
