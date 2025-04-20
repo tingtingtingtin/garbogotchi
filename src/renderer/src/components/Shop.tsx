@@ -1,24 +1,24 @@
-import classicSkin from '../assets/skins/lebron.png';
-import catSkin from '../assets/skins/cat.png';
-import bearSkin from '../assets/skins/bear.png';
+import classicSkin from '../assets/skins/lebron.png'
+import catSkin from '../assets/skins/cat.png'
+import bearSkin from '../assets/skins/bear.png'
 
 type ShopProps = {
-  onClose: () => void;
-  onSelectSkin: (skin: string) => void;
-};
+  onClose: () => void
+  onSelectSkin: (skin: string) => void
+}
 
 const skins = [
   { id: 'bear', name: 'Bear Tama', image: bearSkin },
   { id: 'cat', name: 'Cat Tama', image: catSkin },
-  { id: 'goat', name: 'GOAT Tama', image: classicSkin },
-];
+  { id: 'goat', name: 'GOAT Tama', image: classicSkin }
+]
 
 const Shop = ({ onClose, onSelectSkin }: ShopProps): React.JSX.Element => {
   return (
     <div className="fixed inset-0 flex justify-center items-center z-20">
-      <div className="pixel-border bg-white p-8 w-4/5 h-4/5 rounded-lg overflow-auto">
+      <div className="pixel-border bg-white flex flex-col items-center justify-around p-8 w-4/5 h-4/5 rounded-lg overflow-auto">
         <h2 className="text-3xl font-bold text-center mb-6">Choose Your Tamagotchi Skin</h2>
-        <div className="grid grid-cols-3 gap-6">
+        <div className="w-full flex flex-row justify-evenly">
           {skins.map((skin) => (
             <div
               key={skin.id}
@@ -38,7 +38,7 @@ const Shop = ({ onClose, onSelectSkin }: ShopProps): React.JSX.Element => {
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Shop;
+export default Shop

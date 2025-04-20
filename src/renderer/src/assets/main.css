@@ -20,7 +20,9 @@
   position: relative;
   border: 2px solid var(--tg-brown);
   border-radius: 8px;
-  box-shadow: 0 0 0 2px white, 0 0 0 4px var(--tg-brown);
+  box-shadow:
+    0 0 0 2px white,
+    0 0 0 4px var(--tg-brown);
 }
 
 @keyframes moveBackground {

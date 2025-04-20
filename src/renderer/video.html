@@ -1,5 +1,5 @@
 <!-- renderer/video.html -->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -24,19 +24,19 @@
   <body>
     <video id="videoElement" autoplay muted playsinline></video>
     <script>
-      const videoElement = document.getElementById('videoElement');
+      const videoElement = document.getElementById('videoElement')
       const setupCamera = async () => {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({
             video: { width: 640, height: 480 }
-          });
-          videoElement.srcObject = stream;
+          })
+          videoElement.srcObject = stream
         } catch (err) {
-          console.error('Failed to access webcam:', err);
+          console.error('Failed to access webcam:', err)
         }
-      };
+      }
 
-      setupCamera();
+      setupCamera()
     </script>
   </body>
 </html>

@@ -1,15 +1,18 @@
-import React from "react";
+import React from 'react'
 
 type HistoryProps = {
-  onClose: () => void;
-  pastTamagotchis: { level: number; xp: number }[];
-};
+  onClose: () => void
+  pastTamagotchis: { level: number; xp: number }[]
+}
 
 const History = ({ onClose, pastTamagotchis }: HistoryProps): React.JSX.Element => {
   // Find the Tamagotchi with the highest XP (or level)
-  const topTamagotchi = pastTamagotchis.reduce((top, current) => {
+  const topTamagotchi = pastTamagotchis.reduce(
+    (top, current) => {
       return current.xp > top.xp ? current : top
-  }, { level: 0, xp: 0 });
+    },
+    { level: 0, xp: 0 }
+  )
 
   return (
     <div className="fixed inset-0 flex justify-center items-center z-20">
@@ -40,11 +43,11 @@ const History = ({ onClose, pastTamagotchis }: HistoryProps): React.JSX.Element 
               ))}
             </div>
           </div>
-        ) :
+        ) : (
           <div className="text-center text-gray-500">
             <p className="text-lg">No Tamagotchis to display.</p>
           </div>
-        }
+        )}
 
         {/* Close Button */}
         <button
@@ -55,7 +58,7 @@ const History = ({ onClose, pastTamagotchis }: HistoryProps): React.JSX.Element 
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default History;
+export default History
