@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import tamagotchiImage from './assets/tamagotchi.png'; // Replace with your Tamagotchi image
+import ModelVideo from './components/ModelVideo';
+import ErrorBoundary from './components/ErrorBoundary';
+
 
 function App(): React.JSX.Element {
   const [points, setPoints] = useState(0);
@@ -37,6 +40,12 @@ function App(): React.JSX.Element {
         <button className="sort-trash-button" onClick={incrementPoints}>
           Sort Trash Correctly!
         </button>
+      </div>
+      <div>
+        <h1>Electron + React + Teachable Machine</h1>
+        <ErrorBoundary>
+          <ModelVideo />
+        </ErrorBoundary>
       </div>
 
       <footer className="footer">
