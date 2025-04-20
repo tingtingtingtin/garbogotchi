@@ -21,7 +21,7 @@ const ClassEnum: { [key: string]: number } = {
 
 
 
-const ModelVideo: React.FC<{ onPrediction: (prediction: string) => void }> = ({onPrediction,}) => {
+const ModelVideo: React.FC<{ onPrediction: (prediction: number) => void }> = ({onPrediction,}) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [predictions, setPredictions] = useState<Prediction[]>([]);
@@ -101,15 +101,15 @@ const ModelVideo: React.FC<{ onPrediction: (prediction: string) => void }> = ({o
             //console.log("Best Prediction:", bestPrediction);
 
             // Map the class name to an enum value
-            let enumValue = ClassEnum[bestPrediction.className];
+            const enumValue = ClassEnum[bestPrediction.className];
             console.log("Mapped Enum Value:", enumValue);
-            onPrediction(bestPrediction.className);
 
             // Send the value to the Arduino
             if (enumValue !== undefined && enumValue !== pastValueRef.current) {
               window.electron.ipcRenderer.send('serial-write', enumValue);
               // console.log("Sent to Arduino:", enumValue);
             }
+            onPrediction(pastValueRef.current ?? 0);
             pastValueRef.current = enumValue;
           }
         }
