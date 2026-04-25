@@ -1,4 +1,19 @@
-# garbogotchi
+<div align="center" >
+<h1 align="center">GarboGotchi</h1>
+<p align="center">
+  Have you ever wanted to make cleaning fun? Now you can... with <strong>GarboGotchi</strong>!</br>
+  Link good trash habits to a fun pet that makes you sort trash correctly while rewarding you every time you clean.
+</p>
+
+<img width="806" height="564" alt="image" src="https://github.com/user-attachments/assets/d59d3715-fc87-4013-99d4-99e78fd40f67" />
+<br/>
+<p align="center">
+  <blockquote>
+    This project won 2nd Place Overall at CitrusHack 2025. For more information, check the <a target="_blank" rel="noopener noreferrer" href="https://devpost.com/software/garbogotchi">DevPost</a>.
+  </blockquote>
+</p>
+</div>
+
 
 ## Inspiration
 
